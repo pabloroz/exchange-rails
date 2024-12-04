@@ -1,0 +1,12 @@
+<% content_for :title, "Editing email alert" %>
+
+<h1>Editing email alert</h1>
+
+<%= render "form", email_alert: @email_alert %>
+
+<br>
+
+<div>
+  <%= link_to "Show this email alert", @email_alert %> |
+  <%= link_to "Back to email alerts", email_alerts_path %>
+</div>

@@ -1,0 +1,13 @@
+<h1>Exchange Rates for <%= params[:currency].upcase %></h1>
+<a href="/">Back to Currencies</a>
+<table class="table table-striped table-bordered" data-controller="currency" data-currency="<%= params[:currency] %>">
+  <thead class="table-dark">
+    <tr>
+      <th>Currency Pair</th>
+      <th>Exchange Rate</th>
+    </tr>
+  </thead>
+  <tbody data-currency-target="tableBody">
+    <!-- JavaScript will populate this -->
+  </tbody>
+</table>

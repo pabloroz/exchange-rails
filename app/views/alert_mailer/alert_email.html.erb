@@ -1,0 +1,7 @@
+<p>Hello,</p>
+<p>The exchange rate for <strong><%= @email_alert.base_currency %>/<%= @email_alert.quote_currency %></strong> has reached <strong><%= @current_rate %></strong>, which is above your threshold of <%= @email_alert.multiplier %>.</p>
+<p>Thank you for using our service!</p>
+<p>
+  If you no longer wish to receive these alerts, you can 
+  <a href="<%= unsubscribe_url(id: @email_alert.id) %>">unsubscribe here</a>.
+</p>

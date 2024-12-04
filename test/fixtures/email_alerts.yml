@@ -1,0 +1,21 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user: one
+  base_currency: MyString
+  quote_currency: MyString
+  comparison_operator: 1
+  multiplier: 1.5
+  active: false
+  unsubscribed_at: 2024-12-03 11:15:10
+  last_sent_at: 2024-12-03 11:15:10
+
+two:
+  user: two
+  base_currency: MyString
+  quote_currency: MyString
+  comparison_operator: 1
+  multiplier: 1.5
+  active: false
+  unsubscribed_at: 2024-12-03 11:15:10
+  last_sent_at: 2024-12-03 11:15:10

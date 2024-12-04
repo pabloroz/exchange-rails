@@ -1,0 +1,9 @@
+en:
+  activerecord:
+    attributes:
+      email_alert:
+        comparison_operator_list:
+          greater_than: ">"
+          lower_than: "<"
+          equal: "="
+          

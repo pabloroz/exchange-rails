@@ -1,0 +1,37 @@
+<%= form_with(model: email_alert) do |form| %>
+  <% if email_alert.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(email_alert.errors.count, "error") %> prohibited this email_alert from being saved:</h2>
+
+      <ul>
+        <% email_alert.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :base_currency, style: "display: block" %>
+    <%= form.text_field :base_currency %>
+  </div>
+
+  <div>
+    <%= form.label :quote_currency, style: "display: block" %>
+    <%= form.text_field :quote_currency %>
+  </div>
+
+  <div>
+    <%= form.label :comparison_operator, style: "display: block" %>
+    <%= form.select :comparison_operator, comparison_operators %>
+  </div>
+
+  <div>
+    <%= form.label :multiplier, style: "display: block" %>
+    <%= form.text_field :multiplier %>
+  </div>
+
+  <div>
+    <%= form.submit %>
+  </div>
+<% end %>
