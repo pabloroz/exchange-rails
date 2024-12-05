@@ -22,6 +22,25 @@ class EmailAlertsController < ApplicationController
     @last_six_days = @email_alert.previous_triggers(6)
   end
 
+  # POST /email_alerts/update_triggers
+  def update_triggers
+    if params[:base_currency].blank? || params[:quote_currency].blank? || params[:multiplier].blank?
+      render turbo_stream: turbo_stream.replace(:previous_triggers, partial: "shared/error", locals: { message: "Please provide all inputs." })
+      return
+    end
+
+    @email_alert = EmailAlert.new(
+      base_currency: params[:base_currency],
+      quote_currency: params[:quote_currency],
+      multiplier: params[:multiplier],
+      comparison_operator: params[:comparison_operator]
+    )
+
+    @last_six_days = @email_alert.previous_triggers(6)
+
+    render turbo_stream: turbo_stream.update(:previous_triggers, partial: "email_alerts/previous_triggers", locals: { last_six_days: @last_six_days })
+  end
+
   # GET /email_alerts/1/edit
   def edit
   end

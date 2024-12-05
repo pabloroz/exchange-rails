@@ -6,20 +6,9 @@
 
 <br>
 
-<table>
-  <tr>
-    <td>date</td>
-    <td>rate</td>
-    <td>trigger</td>
-  </tr>
-  <% @last_six_days.each do |day, key| %>
-    <tr>
-      <td><%= day %></td>
-      <td><%= @last_six_days[day][:current_rate] %></td>
-      <td><%= @last_six_days[day][:triggered].to_s %></td>
-    </tr>
-  <% end %>
-</table>
+<%= turbo_frame_tag :previous_triggers, data: { controller: "email-alert", target: "email-alert.table" } do %>
+  <%= render "email_alerts/previous_triggers", last_six_days: @last_six_days %>
+<% end %>
 
 <div>
   <%= link_to "Back to email alerts", email_alerts_path %>

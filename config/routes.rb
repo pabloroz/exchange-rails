@@ -1,5 +1,9 @@
 Rails.application.routes.draw do
-  resources :email_alerts
+  resources :email_alerts do
+    collection do
+      post :update_triggers
+    end
+  end
   resources :currencies, only: [ :index ]
   get "unsubscribe", to: "unsubscribes#unsubscribe", as: :unsubscribe
 

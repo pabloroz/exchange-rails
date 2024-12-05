@@ -1,4 +1,4 @@
-<%= form_with(model: email_alert) do |form| %>
+<%= form_with(url: update_triggers_email_alerts_path, method: :post, data: { turbo_frame: "previous_triggers" }) do |form| %>
   <% if email_alert.errors.any? %>
     <div style="color: red">
       <h2><%= pluralize(email_alert.errors.count, "error") %> prohibited this email_alert from being saved:</h2>
@@ -10,28 +10,23 @@
       </ul>
     </div>
   <% end %>
-
   <div>
     <%= form.label :base_currency, style: "display: block" %>
-    <%= form.text_field :base_currency %>
+    <%= form.text_field :base_currency, value: email_alert.base_currency, onchange: "this.form.requestSubmit();" %>
   </div>
 
   <div>
     <%= form.label :quote_currency, style: "display: block" %>
-    <%= form.text_field :quote_currency %>
+    <%= form.text_field :quote_currency, value: email_alert.quote_currency, onchange: "this.form.requestSubmit();" %>
   </div>
 
   <div>
     <%= form.label :comparison_operator, style: "display: block" %>
-    <%= form.select :comparison_operator, comparison_operators %>
+    <%= form.select :comparison_operator, comparison_operators, {}, onchange: "this.form.requestSubmit();" %>
   </div>
 
   <div>
     <%= form.label :multiplier, style: "display: block" %>
-    <%= form.text_field :multiplier %>
-  </div>
-
-  <div>
-    <%= form.submit %>
+    <%= form.text_field :multiplier, value: email_alert.multiplier, onchange: "this.form.requestSubmit();" %>
   </div>
 <% end %>

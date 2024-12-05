@@ -1,0 +1,14 @@
+<table>
+  <tr>
+    <td>date</td>
+    <td>rate</td>
+    <td>trigger</td>
+  </tr>
+  <% last_six_days.each do |day, data| %>
+    <tr>
+      <td><%= day %></td>
+      <td><%= data[:current_rate] %></td>
+      <td><%= data[:triggered].to_s %></td>
+    </tr>
+  <% end %>
+</table>
