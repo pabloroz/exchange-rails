@@ -2,7 +2,7 @@ require "test_helper"
 
 class CheckEmailAlertsServiceTest < ActiveSupport::TestCase
   include ActionMailer::TestHelper
-  
+
   setup do
     @user = users(:one)
 
@@ -92,5 +92,4 @@ class CheckEmailAlertsServiceTest < ActiveSupport::TestCase
       end
     end
   end
-
 end

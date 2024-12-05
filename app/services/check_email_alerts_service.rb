@@ -6,7 +6,7 @@ class CheckEmailAlertsService
       rates = ExchangeRateService.fetch_exchange_rates(base_currency.downcase)
 
       next unless rates # Skip if API call failed
-        
+
       # Process each email_alert for this base currency
       EmailAlert.where(base_currency: base_currency.downcase).find_each do |email_alert|
         current_rate = rates[email_alert.quote_currency.downcase]
@@ -32,5 +32,4 @@ class CheckEmailAlertsService
     email_alert.deactivate!
     AlertMailer.with(email_alert: email_alert, current_rate: current_rate).alert_email.deliver_later
   end
-  
 end

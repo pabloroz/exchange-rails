@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
   resources :email_alerts
-  resources :currencies, only: [:index]
+  resources :currencies, only: [ :index ]
   get "unsubscribe", to: "unsubscribes#unsubscribe", as: :unsubscribe
 
   root "currencies#index"
@@ -14,7 +14,7 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
-  
-  devise_for :users, path: 'auth'
+
+  devise_for :users, path: "auth"
   get "/:currency", to: "currencies#show", as: :currency
 end

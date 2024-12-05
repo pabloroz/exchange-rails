@@ -1,7 +1,7 @@
 require "test_helper"
 
 class UnsubscribesControllerTest < ActionDispatch::IntegrationTest
-  include Devise::Test::IntegrationHelpers 
+  include Devise::Test::IntegrationHelpers
 
   setup do
     @user = users(:one) # Replace with your fixture or factory setup

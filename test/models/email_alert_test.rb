@@ -25,9 +25,6 @@ class EmailAlertTest < ActiveSupport::TestCase
       body: { "usd" => { "eur" => 1.3 } }.to_json,
       status: 200
     )
-
-
-
   end
 
   # Test for previous_triggers
@@ -49,7 +46,7 @@ class EmailAlertTest < ActiveSupport::TestCase
     assert_equal 8, result.count, "Expected 8 days of results"
     assert result.keys.all? { |date| Date.parse(date) }, "Expected all keys to be valid dates"
     assert result.values.all? { |data| data[:current_rate] == 1.9 }, "Expected all current rates to be 1.3"
-    
+
     # Assert triggering logic
     assert result.values.first[:triggered], "Expected the first day to trigger"
     result.values[1..].each do |data|
@@ -60,7 +57,7 @@ class EmailAlertTest < ActiveSupport::TestCase
 
   test "previous_triggers alternates triggered status based on exchange rate changes" do
     # Define rates over 8 days
-    rates = [1.9, 1.1, 1.1, 2, 2.0, 0.8, 1.52, 1.2]
+    rates = [ 1.9, 1.1, 1.1, 2, 2.0, 0.8, 1.52, 1.2 ]
 
     # Stub API responses for each day
     rates.reverse.each_with_index do |rate, days_ago|
@@ -80,7 +77,7 @@ class EmailAlertTest < ActiveSupport::TestCase
     assert result.keys.all? { |date| Date.parse(date) }, "Expected all keys to be valid dates"
 
     # Assert triggering logic
-    expected_triggered = [true, false, false, true, false, false, true, false]
+    expected_triggered = [ true, false, false, true, false, false, true, false ]
     result.values.each_with_index do |data, index|
       assert_equal rates[index], data[:current_rate], "Expected the rate for day #{index} to be #{rates[index]}"
       assert_equal expected_triggered[index], data[:triggered], "Expected triggered for day #{index} to be #{expected_triggered[index]}"
@@ -211,6 +208,4 @@ class EmailAlertTest < ActiveSupport::TestCase
     @active_alert.deactivate!
     assert_not @active_alert.reload.active?, "deactivate! should set active to false"
   end
-
-
 end

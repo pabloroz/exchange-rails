@@ -2,9 +2,9 @@ class EmailAlert < ApplicationRecord
   include TranslateEnum
 
   scope :active, -> { where(active: true) }
-  
+
   belongs_to :user
-  enum :comparison_operator, [:greater_than, :lower_than, :equal], validate: true
+  enum :comparison_operator, [ :greater_than, :lower_than, :equal ], validate: true
 
   validates :multiplier, presence: true, numericality: { greater_than: 0 }
   validates :comparison_operator, presence: true
@@ -79,9 +79,8 @@ class EmailAlert < ApplicationRecord
 
   # Trims decimals to match the precision of the multiplier (used only in :equal)
   def self.trim_decimals(rate, multiplier)
-    decimals = multiplier.to_s.split('.').last&.size || 0
+    decimals = multiplier.to_s.split(".").last&.size || 0
     factor = 10**decimals
     (rate * factor).to_i / factor.to_f
   end
-
 end

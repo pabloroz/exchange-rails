@@ -1,9 +1,8 @@
-require 'net/http'
+require "net/http"
 
 class ExchangeRateService
-  
   def self.fetch_exchange_rates(base_currency, date = "latest")
-    api_url = "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@#{date.to_s}/v1/currencies/#{base_currency&.downcase}.json"
+    api_url = "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@#{date}/v1/currencies/#{base_currency&.downcase}.json"
 
     begin
       response = Net::HTTP.get(URI(api_url))
@@ -17,5 +16,4 @@ class ExchangeRateService
   def self.fetch_exchange_rate(base_currency, quote_currency, date)
     fetch_exchange_rates(base_currency, date)&.[](quote_currency&.downcase)
   end
-
 end
