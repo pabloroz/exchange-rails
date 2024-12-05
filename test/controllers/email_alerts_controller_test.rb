@@ -4,9 +4,30 @@ class EmailAlertsControllerTest < ActionDispatch::IntegrationTest
   include Devise::Test::IntegrationHelpers 
 
   setup do
-    @email_alert = email_alerts(:one)
     @user = users(:one)
+    @email_alert = @user.email_alerts.create!(
+      base_currency: "USD",
+      quote_currency: "EUR",
+      multiplier: 1.2,
+      comparison_operator: :greater_than,
+      active: true
+    )
     sign_in @user
+    # Stub the external API request
+    stub_request(:get, "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2024-12-05/v1/currencies/.json")
+      .to_return(
+        body: { "usd" => { "eur" => 1.2, "gbp" => 0.85 } }.to_json,
+        status: 200,
+        headers: { "Content-Type" => "application/json" }
+      )
+    (0...6).each do |days_ago|
+      date = days_ago.days.ago.to_date.to_s
+      stub_request(:get, "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@#{date}/v1/currencies/usd.json")
+        .to_return(
+          body: { "usd" => { "eur" => 1.2 } }.to_json,
+          status: 200
+        )
+    end
   end
 
   test "should get index" do
@@ -15,6 +36,15 @@ class EmailAlertsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should get new" do
+    6.times do |days_ago|
+      date = days_ago.days.ago.to_date.to_s
+      stub_request(:get, "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@#{date}/v1/currencies/usd.json")
+        .to_return(
+          body: { "usd" => { "eur" => 1.9 } }.to_json,
+          status: 200
+        )
+    end
+
     get new_email_alert_url
     assert_response :success
   end

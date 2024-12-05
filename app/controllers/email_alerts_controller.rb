@@ -16,8 +16,10 @@ class EmailAlertsController < ApplicationController
     @email_alert = EmailAlert.new(
       base_currency: params[:base_currency],
       quote_currency: params[:quote_currency],
-      multiplier: params[:multiplier]
+      multiplier: params[:multiplier],
+      comparison_operator: :greater_than
     )
+    @last_six_days = @email_alert.previous_triggers(6)
   end
 
   # GET /email_alerts/1/edit

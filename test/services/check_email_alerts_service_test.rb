@@ -23,25 +23,28 @@ class CheckEmailAlertsServiceTest < ActiveSupport::TestCase
       active: false
     )
 
-    @service = CheckEmailAlertsService.new
+    # Stub for exchange rates API
+    @api_url = "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json"
+    stub_request(:get, @api_url).to_return(
+      body: { "usd" => { "eur" => 1.3 } }.to_json,
+      status: 200
+    )
 
-    # Default stub for fetch_exchange_rates
-    def @service.fetch_exchange_rates(_base_currency)
-      { "eur" => 1.3 }
-    end
+
+    @check_email_alerts_service = CheckEmailAlertsService.new()
   end
 
   test "sends email alert and deactivates alert when should_trigger? is true" do
     assert_changes -> { @active_alert.reload.active }, from: true, to: false do
       assert_enqueued_email_with AlertMailer, :alert_email, params: { email_alert: @active_alert, current_rate: 1.3 } do
-        @service.call
+        @check_email_alerts_service.call
       end
     end
   end
 
   test "reactivates alert when should_reactivate? is true" do
     assert_changes -> { @inactive_alert.reload.active }, from: false, to: true do
-      @service.call
+      @check_email_alerts_service.call
     end
   end
 
@@ -52,35 +55,39 @@ class CheckEmailAlertsServiceTest < ActiveSupport::TestCase
     assert_no_difference "ActionMailer::Base.deliveries.size" do
       assert_no_changes -> { @active_alert.reload.active } do
         assert_no_changes -> { @inactive_alert.reload.active } do
-          @service.call
+          @check_email_alerts_service.call
         end
       end
     end
   end
 
   test "skips processing when current_rate is nil" do
-    def @service.fetch_exchange_rates(_base_currency)
-      { "eur" => nil }
-    end
+    # Stub for exchange rates API
+    stub_request(:get, @api_url).to_return(
+      body: { "usd" => nil }.to_json,
+      status: 200
+    )
 
     assert_no_difference "ActionMailer::Base.deliveries.size" do
       assert_no_changes -> { @active_alert.reload.active } do
         assert_no_changes -> { @inactive_alert.reload.active } do
-          @service.call
+          @check_email_alerts_service.call
         end
       end
     end
   end
 
   test "skips processing when rates are nil" do
-    def @service.fetch_exchange_rates(_base_currency)
-      nil
-    end
+    @api_url = "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json"
+    stub_request(:get, @api_url).to_return(
+      body: {}.to_json,
+      status: 200
+    )
 
     assert_no_difference "ActionMailer::Base.deliveries.size" do
       assert_no_changes -> { @active_alert.reload.active } do
         assert_no_changes -> { @inactive_alert.reload.active } do
-          @service.call
+          @check_email_alerts_service.call
         end
       end
     end

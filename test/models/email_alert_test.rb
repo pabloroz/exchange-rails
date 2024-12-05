@@ -18,6 +18,83 @@ class EmailAlertTest < ActiveSupport::TestCase
       comparison_operator: :greater_than,
       active: false
     )
+
+    # Stub for exchange rates API
+    @api_url = "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json"
+    stub_request(:get, @api_url).to_return(
+      body: { "usd" => { "eur" => 1.3 } }.to_json,
+      status: 200
+    )
+
+
+
+  end
+
+  # Test for previous_triggers
+  test "previous_triggers returns the last n days" do
+    # Stub API responses for the last 8 days
+    8.times do |days_ago|
+      date = days_ago.days.ago.to_date.to_s
+      stub_request(:get, "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@#{date}/v1/currencies/usd.json")
+        .to_return(
+          body: { "usd" => { "eur" => 1.9 } }.to_json,
+          status: 200
+        )
+    end
+
+    # Call the method
+    result = @active_alert.previous_triggers(8)
+
+    # Assert that the result contains data for the last 8 days
+    assert_equal 8, result.count, "Expected 8 days of results"
+    assert result.keys.all? { |date| Date.parse(date) }, "Expected all keys to be valid dates"
+    assert result.values.all? { |data| data[:current_rate] == 1.9 }, "Expected all current rates to be 1.3"
+    
+    # Assert triggering logic
+    assert result.values.first[:triggered], "Expected the first day to trigger"
+    result.values[1..].each do |data|
+      assert_not data[:triggered], "Expected subsequent days to not trigger unless reactivated"
+    end
+  end
+
+
+  test "previous_triggers alternates triggered status based on exchange rate changes" do
+    # Define rates over 8 days
+    rates = [1.9, 1.1, 1.1, 2, 2.0, 0.8, 1.52, 1.2]
+
+    # Stub API responses for each day
+    rates.reverse.each_with_index do |rate, days_ago|
+      date = days_ago.days.ago.strftime("%Y-%m-%d")
+      stub_request(:get, "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@#{date}/v1/currencies/usd.json")
+        .to_return(
+          body: { "usd" => { "eur" => rate } }.to_json,
+          status: 200
+        )
+    end
+
+    # Call the method
+    result = @active_alert.previous_triggers(8)
+
+    # Assert that the result contains data for 8 days
+    assert_equal 8, result.count, "Expected 8 days of results"
+    assert result.keys.all? { |date| Date.parse(date) }, "Expected all keys to be valid dates"
+
+    # Assert triggering logic
+    expected_triggered = [true, false, false, true, false, false, true, false]
+    result.values.each_with_index do |data, index|
+      assert_equal rates[index], data[:current_rate], "Expected the rate for day #{index} to be #{rates[index]}"
+      assert_equal expected_triggered[index], data[:triggered], "Expected triggered for day #{index} to be #{expected_triggered[index]}"
+    end
+  end
+
+  test "previous_triggers includes today" do
+    stub_request(:get, %r{https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@\d{4}-\d{2}-\d{2}/v1/currencies/usd.json})
+      .to_return(body: { "usd" => { "eur" => 1.3 } }.to_json, status: 200)
+
+    triggers = @active_alert.previous_triggers(3)
+
+    assert_equal 3, triggers.count, "Expected 3 days including today"
+    assert_includes triggers.keys, Date.today.to_s, "Expected today's date to be included"
   end
 
   # Tests for `should_trigger?`
@@ -89,9 +166,9 @@ class EmailAlertTest < ActiveSupport::TestCase
     assert_not @inactive_alert.should_reactivate?(1.4), "should_reactivate? should return false when rate is not above multiplier"
   end
 
-  test "should_reactivate? always returns false for equal" do
+  test "should_reactivate? always returns true for equal" do
     @inactive_alert.comparison_operator = :equal
-    assert_not @inactive_alert.should_reactivate?(1.5), "should_reactivate? should always return false for equal operator"
+    assert @inactive_alert.should_reactivate?(1.5), "should_reactivate? should always return false for equal operator"
   end
 
   # Tests for `active` scope

@@ -18,7 +18,6 @@ class UnsubscribesControllerTest < ActionDispatch::IntegrationTest
   test "should destroy an alert successfully" do
     sign_in @user # Assuming Devise or similar authentication
     assert_difference "@user.email_alerts.count", -1 do
-      
       get unsubscribe_url(id: @email_alert.id)
     end
   end
